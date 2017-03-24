@@ -4,10 +4,10 @@ namespace Kareylo\Comments\Test\TestCase\Controller;
 use Cake\Network\Exception\MethodNotAllowedException;
 use Cake\Network\Request;
 use Cake\Network\Session;
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Kareylo\Comments\Model\Table\CommentsTable;
-
 
 class CommentsControllerTest extends TestCase
 {
@@ -22,9 +22,15 @@ class CommentsControllerTest extends TestCase
      */
     public $session;
 
+    /**
+     * @var Table
+     */
+    public $model;
+
     public $fixtures = [
         'plugin.kareylo/comments.comments',
         'plugin.kareylo/comments.posts',
+        'plugin.kareylo/comments.articles',
         'plugin.kareylo/comments.users',
     ];
 
@@ -46,26 +52,31 @@ class CommentsControllerTest extends TestCase
         TableRegistry::clear();
     }
 
-    private function _init($method = 'POST')
+    private function _init($method = 'POST', $options = [], $removeBehavior = false)
     {
+        if (is_array($method)) {
+            $options = $method;
+            $method = 'POST';
+        }
         $_SERVER['REQUEST_METHOD'] = $method;
         $this->session->write('Auth.User.id', 1);
-    }
-
-    private function _setData($options = [])
-    {
         $this->Controller->request->data = array_merge([
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => '2',
             'parent_id' => ''
         ], $options);
+        $this->model = TableRegistry::get($this->Controller->request->data['ref']);
+        if ($this->Controller->request->data['ref'] !== 'Posts' || $removeBehavior) {
+            $this->model->behaviors()->unload('Commentable');
+        } else {
+            $this->model->addBehavior('Kareylo/Comments.Commentable');
+        }
     }
 
     public function testAddCommentWithBadMethod()
     {
         $this->_init('GET');
-        $this->_setData();
         $this->expectException(MethodNotAllowedException::class);
         $this->expectExceptionMessage('Only Post');
         $this->_add();
@@ -77,14 +88,13 @@ class CommentsControllerTest extends TestCase
     public function testAddCommentWithCorrectRefIdAndWithoutParentId()
     {
         $this->_init();
-        $this->_setData();
-        $this->assertTrue($this->_add());
+        $result = $this->_add();
+        $this->assertTrue($result);
     }
 
     public function testAddCommentWithIncorrectRefIdAndWithoutParentId()
     {
-        $this->_init();
-        $this->_setData(['ref_id' => 19]);
+        $this->_init(['ref_id' => '999999']);
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage('This Model is not Commentable');
         $this->_add();
@@ -92,41 +102,37 @@ class CommentsControllerTest extends TestCase
 
     public function testAddCommentWithCorrectParentId()
     {
-        $this->_init();
-        $this->_setData(['parent_id' => '1']);
-        $this->assertTrue($this->_add());
+        $this->_init(['parent_id' => '1']);
+        $result = $this->_add();
+        $this->assertTrue($result);
     }
 
     public function testAddCommentWithIncorrectParentId()
     {
-        $this->_init();
-        $this->_setData(['parent_id' => '999999']);
+        $this->_init(['parent_id' => '999999']);
         $this->expectException(\OutOfBoundsException::class);
         $this->expectExceptionMessage("You can't comment this record");
         $this->_add();
     }
 
-    public function testAddCommentWithoutBehavior()
-    {
-        $this->_init();
-        $this->_setData();
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Behavior is not loaded');
-        $this->_add(true);
-    }
-
     public function testAddCommentWithModelRefIdNotExists()
     {
-        $this->_init();
-        $this->_setData(['ref_id' => '999999']);
+        $this->_init(['ref_id' => '999999']);
         $this->expectException(\OutOfBoundsException::class);
         $this->_add();
     }
 
     public function testAddCommentWithModelNotExists()
     {
-        $this->_init();
-        $this->_setData(['ref' => 'Articles']);
+        $this->_init(['ref' => 'Articles']);
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Behavior is not loaded');
+        $this->_add();
+    }
+
+    public function testAddCommentWithoutBehavior()
+    {
+        $this->_init('POST', [], true);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Behavior is not loaded');
         $this->_add();
@@ -136,19 +142,13 @@ class CommentsControllerTest extends TestCase
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = array_merge($this->Controller->request->getData(), ['ip' => $this->Controller->request->clientIp(), 'user_id' => $this->session->read('Auth.User.id')]);
-            $model = TableRegistry::get($data['ref']);
 
-            // Force unload to test
-            if ($disableBehavior) {
-                $model->behaviors()->unload('Commentable');
-            }
-
-            if (!$model->hasBehavior('Commentable')) {
+            if (!$this->model->hasBehavior('Commentable')) {
                 throw new \Exception('Behavior is not loaded');
             }
 
             // check if we can comment this content
-            if ($model->hasBehavior('Commentable') && !$model->exists(['id' => $data['ref_id']])) {
+            if ($this->model->hasBehavior('Commentable') && !$this->model->exists(['id' => $data['ref_id']])) {
                 throw new \OutOfBoundsException('This Model is not Commentable');
             }
 
@@ -157,9 +157,9 @@ class CommentsControllerTest extends TestCase
                 throw new \OutOfBoundsException("You can't comment this record");
             }
 
-            $comment = $model->Comments->newEntity();
-            $comment = $model->Comments->patchEntity($comment, $data);
-            if ($model->Comments->save($comment)) {
+            $comment = $this->model->Comments->newEntity();
+            $comment = $this->model->Comments->patchEntity($comment, $data);
+            if ($this->model->Comments->save($comment)) {
                 return true;
             } else {
                 return false;
