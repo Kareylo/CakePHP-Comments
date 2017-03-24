@@ -1,8 +1,10 @@
 <?php
 namespace Kareylo\Comments\Test\Fixture;
+
 use Cake\TestSuite\Fixture\TestFixture;
 
-class UsersFixture extends TestFixture {
+class UsersFixture extends TestFixture
+{
     /**
      * Fields
      *

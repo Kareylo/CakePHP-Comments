@@ -168,5 +168,4 @@ class CommentsControllerTest extends TestCase
             throw new MethodNotAllowedException('Only Post');
         }
     }
-
 }

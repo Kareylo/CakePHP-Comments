@@ -87,5 +87,4 @@ class CommentsFixture extends TestFixture
             'modified' => '2017-03-22 17:07:00',
         ]
     ];
-
 }

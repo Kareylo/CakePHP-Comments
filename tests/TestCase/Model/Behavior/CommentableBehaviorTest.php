@@ -51,7 +51,6 @@ class CommentableBehaviorTest extends TestCase
         $this->Posts->addBehavior('Kareylo/Comments.Commentable', []);
         $result = $this->Posts->find()->where('Posts.id = 999')->find('comments')->first();
         $this->assertEquals(null, $result);
-
     }
 
     public function testFindCommentsWithModelData()

@@ -39,5 +39,4 @@ class ArticlesFixture extends TestFixture
             'user_id' => 1
         ]
     ];
-
 }

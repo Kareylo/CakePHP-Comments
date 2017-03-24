@@ -42,5 +42,4 @@ class PostsFixture extends TestFixture
             'user_id' => 1
         ]
     ];
-
 }
