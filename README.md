@@ -4,7 +4,6 @@
 [![Total Downloads](https://poser.pugx.org/kareylo/cakephp-comments/downloads)](https://packagist.org/packages/kareylo/cakephp-comments)
 [![Latest Unstable Version](https://poser.pugx.org/kareylo/cakephp-comments/v/unstable)](https://packagist.org/packages/kareylo/cakephp-comments)
 [![License](https://poser.pugx.org/kareylo/cakephp-comments/license)](https://packagist.org/packages/kareylo/cakephp-comments)
-[![Coding Standards](https://img.shields.io/badge/cs-PSR--2--R-yellow.svg)](https://github.com/php-fig-rectified/fig-rectified-standards)
 
 The **Comments** plugin will allow you comment every model with the possibility to change the template in your APP.
 
@@ -20,6 +19,13 @@ This plugin works with a behavior and a helper you need to load to fully works.
 
 ```
 composer require Kareylo/CakePHP-Comments
+```
+
+load the plugin in your `config/bootstrap.php` :
+```php
+Plugin::load('Kareylo/Comments', [
+    'routes' => true
+]);
 ```
 
 Add in the ModelTable you wanna be commentable the following behavior :
@@ -38,14 +44,7 @@ The behavior can take these options :
 * **fieldCounter** : Name of your counter field
     * **Default** : `comments_count`
 
-Add the following helper in your controller 
-```php
-public function initialize()
-{
-    $this->helpers = ['Kareylo/Comments.Comment'];
-}
-```
-or in your AppView
+Add the following helper in your `src/View/AppView.php`
 ```php
 public function initialize()
 {
@@ -151,5 +150,7 @@ For bugs and feature requests, please use the [issues](https://github.com/kareyl
 Licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php) License. Redistributions of the source code included in this repository must retain the copyright notice found in each file.
 
 ## TODO
-- [ ] Test cases
+- [X] Test cases
+    - [ ] Improved Test Cases (like test Helper)
 - [ ] More features
+- [ ] Translation
