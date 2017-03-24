@@ -63,7 +63,7 @@ The helper can take these options :
 
 Get all your comments with the comments finder
 ```php
-$data = $this->Model->find()->where(['Model.id' => $id])->find('comments');
+$data = $this->Model->find()->where(['Model.id' => $id])->find('comments')->first();
 $this->set(compact('data'));
 ```
 
