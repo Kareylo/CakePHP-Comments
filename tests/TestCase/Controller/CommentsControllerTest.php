@@ -1,14 +1,11 @@
 <?php
 namespace Kareylo\Comments\Test\TestCase\Controller;
 
-use Cake\Controller\Component\AuthComponent;
-use Cake\ORM\Table;
 use Cake\Network\Exception\MethodNotAllowedException;
 use Cake\Network\Request;
 use Cake\Network\Session;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
-use Kareylo\Comments\Controller\CommentsController;
 use Kareylo\Comments\Model\Table\CommentsTable;
 
 
@@ -16,7 +13,7 @@ class CommentsControllerTest extends TestCase
 {
 
     /**
-     * @var CommentsController $Controller
+     * @var CommentsTable $Controller
      */
     public $Controller;
 

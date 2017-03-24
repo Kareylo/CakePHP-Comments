@@ -1,5 +1,9 @@
 # Fully customizable Comments Plugin for CakePHP 3
-
+[![Build Status](https://travis-ci.org/Kareylo/CakePHP-Comments.svg?branch=master)](https://travis-ci.org/Kareylo/CakePHP-Comments)
+[![Latest Stable Version](https://poser.pugx.org/kareylo/cakephp-comments/v/stable)](https://packagist.org/packages/kareylo/cakephp-comments)
+[![Total Downloads](https://poser.pugx.org/kareylo/cakephp-comments/downloads)](https://packagist.org/packages/kareylo/cakephp-comments)
+[![Latest Unstable Version](https://poser.pugx.org/kareylo/cakephp-comments/v/unstable)](https://packagist.org/packages/kareylo/cakephp-comments)
+[![License](https://poser.pugx.org/kareylo/cakephp-comments/license)](https://packagist.org/packages/kareylo/cakephp-comments)
 [![Coding Standards](https://img.shields.io/badge/cs-PSR--2--R-yellow.svg)](https://github.com/php-fig-rectified/fig-rectified-standards)
 
 The **Comments** plugin will allow you comment every model with the possibility to change the template in your APP.
