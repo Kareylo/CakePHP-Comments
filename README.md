@@ -136,6 +136,17 @@ Example :
     <?= $this->Form->button(__('Commenter')) ?>
 <?= $this->Form->end() ?>
 ```
+To create the template for your flash, just add a element in `src/Template/Element/Flash/Comments` and name it `comment.ctp`
+ ```php
+ //src/Template/Element/Flash/Comments/comment.ctp
+ <?php
+ if (!isset($params['escape']) || $params['escape'] !== false) {
+     $message = h($message);
+ }
+ ?>
+ <div class="message <?= $params['class'] ?? 'success' ?>" onclick="this.classList.add('hidden');"><?= $message ?></div>
+ ```
+ - `$params['class']` can have the values `success` and `error` 
 
 ## Support
 
