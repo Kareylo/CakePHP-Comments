@@ -32,7 +32,6 @@ class CommentsFixture extends TestFixture
      */
     public $records = [
         [
-            'id' => 1,
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => 2,
@@ -43,7 +42,6 @@ class CommentsFixture extends TestFixture
             'modified' => '2017-03-22 12:00:00',
         ],
         [
-            'id' => 2,
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => 2,
@@ -54,7 +52,6 @@ class CommentsFixture extends TestFixture
             'modified' => '2017-03-22 12:05:00',
         ],
         [
-            'id' => 3,
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => 2,
@@ -65,7 +62,6 @@ class CommentsFixture extends TestFixture
             'modified' => '2017-03-22 12:07:00',
         ],
         [
-            'id' => 4,
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => 2,
@@ -76,7 +72,6 @@ class CommentsFixture extends TestFixture
             'modified' => '2017-03-22 12:07:00',
         ],
         [
-            'id' => 5,
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => 2,
