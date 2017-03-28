@@ -4,6 +4,7 @@ namespace Kareylo\Comments\Test\TestCase\Model\Table;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
+use Kareylo\Comments\Model\Table\CommentsTable;
 
 /**
  * CakePHP Ratings Plugin
@@ -16,12 +17,6 @@ use Cake\TestSuite\TestCase;
 class CommentsTableTest extends TestCase
 {
     /**
-     * Rating Model
-     *
-     * @var Comments
-     */
-    public $Comments = null;
-    /**
      * Fixtures
      *
      * @var array
@@ -31,6 +26,12 @@ class CommentsTableTest extends TestCase
         'plugin.kareylo/comments.comments',
         'plugin.kareylo/comments.posts'
     ];
+
+    /**
+     * @var CommentsTable
+     */
+    private $Comments;
+
     /**
      * Start Test callback
      *
@@ -43,7 +44,7 @@ class CommentsTableTest extends TestCase
         $this->Comments = TableRegistry::get('Kareylo/Comments.Comments');
     }
     /**
-     * testRatingInstance
+     * testCommentInstance
      *
      * @return void
      */

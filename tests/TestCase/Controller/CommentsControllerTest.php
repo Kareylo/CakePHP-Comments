@@ -1,9 +1,11 @@
 <?php
+
 namespace Kareylo\Comments\Test\TestCase\Controller;
 
 use Cake\Network\Exception\MethodNotAllowedException;
 use Cake\Network\Request;
 use Cake\Network\Session;
+use Cake\ORM\Exception\MissingBehaviorException;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
@@ -13,12 +15,12 @@ class CommentsControllerTest extends TestCase
 {
 
     /**
-     * @var CommentsTable $Controller
+     * @var CommentsTable
      */
     public $Controller;
 
     /**
-     * @var Session $session
+     * @var Session
      */
     public $session;
 
@@ -27,13 +29,24 @@ class CommentsControllerTest extends TestCase
      */
     public $model;
 
+    /**
+     * @var array
+     */
     public $fixtures = [
         'plugin.kareylo/comments.comments',
         'plugin.kareylo/comments.posts',
         'plugin.kareylo/comments.articles',
         'plugin.kareylo/comments.users',
     ];
+    /**
+     * @var Request
+     */
+    private $request;
 
+    /**
+     * setup
+     * @return void
+     */
     public function setup()
     {
         parent::setUp();
@@ -41,9 +54,13 @@ class CommentsControllerTest extends TestCase
         $this->session = new Session();
 
         $this->Controller = TableRegistry::get('Comments');
-        $this->Controller->request = new Request();
+        $this->request = new Request();
     }
 
+    /**
+     * tearDown
+     * @return void
+     */
     public function tearDown()
     {
         parent::tearDown();
@@ -52,6 +69,12 @@ class CommentsControllerTest extends TestCase
         TableRegistry::clear();
     }
 
+    /**
+     * init
+     * @param string $method
+     * @param array $options
+     * @param bool $removeBehavior
+     */
     private function _init($method = 'POST', $options = [], $removeBehavior = false)
     {
         if (is_array($method)) {
@@ -60,20 +83,24 @@ class CommentsControllerTest extends TestCase
         }
         $_SERVER['REQUEST_METHOD'] = $method;
         $this->session->write('Auth.User.id', 1);
-        $this->Controller->request->data = array_merge([
+        $this->request->data = array_merge([
             'content' => 'Lorem Ipsum',
             'ref' => 'Posts',
             'ref_id' => '2',
             'parent_id' => ''
         ], $options);
-        $this->model = TableRegistry::get($this->Controller->request->data['ref']);
-        if ($this->Controller->request->data['ref'] !== 'Posts' || $removeBehavior) {
+        $this->model = TableRegistry::get($this->request->data['ref']);
+        if ($this->request->data['ref'] !== 'Posts' || $removeBehavior) {
             $this->model->behaviors()->unload('Commentable');
         } else {
             $this->model->addBehavior('Kareylo/Comments.Commentable');
         }
     }
 
+    /**
+     * Test to add a comment with bad method
+     * @return void
+     */
     public function testAddCommentWithBadMethod()
     {
         $this->_init('GET');
@@ -84,6 +111,7 @@ class CommentsControllerTest extends TestCase
 
     /**
      * Correct comment add (correct ref and ref_id)
+     * @return void
      */
     public function testAddCommentWithCorrectRefIdAndWithoutParentId()
     {
@@ -92,6 +120,10 @@ class CommentsControllerTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Add comment with incorrect RefId
+     * @return void
+     */
     public function testAddCommentWithIncorrectRefIdAndWithoutParentId()
     {
         $this->_init(['ref_id' => '999999']);
@@ -100,6 +132,10 @@ class CommentsControllerTest extends TestCase
         $this->_add();
     }
 
+    /**
+     * Add comment with parent_id
+     * @return void
+     */
     public function testAddCommentWithCorrectParentId()
     {
         $this->_init(['parent_id' => '1']);
@@ -107,6 +143,10 @@ class CommentsControllerTest extends TestCase
         $this->assertTrue($result);
     }
 
+    /**
+     * Add Comment with incorrect parent_id
+     * @return void
+     */
     public function testAddCommentWithIncorrectParentId()
     {
         $this->_init(['parent_id' => '999999']);
@@ -115,36 +155,42 @@ class CommentsControllerTest extends TestCase
         $this->_add();
     }
 
-    public function testAddCommentWithModelRefIdNotExists()
-    {
-        $this->_init(['ref_id' => '999999']);
-        $this->expectException(\OutOfBoundsException::class);
-        $this->_add();
-    }
-
+    /**
+     * Add comment while ref not exists
+     * @return void
+     */
     public function testAddCommentWithModelNotExists()
     {
         $this->_init(['ref' => 'Articles']);
-        $this->expectException(\Exception::class);
+        $this->expectException(MissingBehaviorException::class);
         $this->expectExceptionMessage('Behavior is not loaded');
         $this->_add();
     }
 
+    /**
+     * add comment with behavior not loaded
+     * @return void
+     */
     public function testAddCommentWithoutBehavior()
     {
         $this->_init('POST', [], true);
-        $this->expectException(\Exception::class);
+        $this->expectException(MissingBehaviorException::class);
         $this->expectExceptionMessage('Behavior is not loaded');
         $this->_add();
     }
 
-    protected function _add($disableBehavior = false)
+    /**
+     * Same method as action add in CommentsController but throw exception, not flash messages
+     * @return bool
+     * @throws \Exception
+     */
+    protected function _add()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = array_merge($this->Controller->request->getData(), ['ip' => $this->Controller->request->clientIp(), 'user_id' => $this->session->read('Auth.User.id')]);
+            $data = array_merge($this->request->getData(), ['ip' => $this->request->clientIp(), 'user_id' => $this->session->read('Auth.User.id')]);
 
             if (!$this->model->hasBehavior('Commentable')) {
-                throw new \Exception('Behavior is not loaded');
+                throw new MissingBehaviorException('Behavior is not loaded');
             }
 
             // check if we can comment this content

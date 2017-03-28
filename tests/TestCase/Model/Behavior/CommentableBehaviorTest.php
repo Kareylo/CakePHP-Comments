@@ -1,4 +1,5 @@
 <?php
+
 namespace Kareylo\Comments\Test\TestCase\Model\Behavior;
 
 use App\Model\Table\PostsTable;
@@ -14,18 +15,29 @@ class CommentableBehaviorTest extends TestCase
      */
     public $Posts = null;
 
+    /**
+     * @var array
+     */
     public $fixtures = [
         'plugin.kareylo/comments.comments',
         'plugin.kareylo/comments.users',
         'plugin.kareylo/comments.posts',
     ];
 
+    /**
+     * setUp
+     * @return void
+     */
     public function setUp()
     {
         parent::setUp();
         $this->Posts = TableRegistry::get('Posts');
     }
 
+    /**
+     * tearDown
+     * @return void
+     */
     public function tearDown()
     {
         parent::tearDown();
@@ -34,16 +46,21 @@ class CommentableBehaviorTest extends TestCase
     }
 
     /**
-     *
+     * Test the finder with no comments
+     * @return void
      */
     public function testFindCommentsWithoutComments()
     {
         $this->Posts->addBehavior('Kareylo/Comments.Commentable', []);
         $result = $this->Posts->find()->where(['id' => 1])->find('comments')->first();
-        $expected = $this->Posts->find()->where(['id' => 1])->contain('Comments')->first();
+        $expected = $this->Posts->get(1, ['contain' => 'Comments']);
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * Test the finder when there's no datas
+     * @return void
+     */
     public function testFindCommentsWithEmptyModelData()
     {
         $this->Posts->addBehavior('Kareylo/Comments.Commentable', []);
@@ -51,13 +68,17 @@ class CommentableBehaviorTest extends TestCase
         $this->assertEquals(null, $result);
     }
 
+    /**
+     * Test the finder with data
+     * @return void
+     */
     public function testFindCommentsWithModelData()
     {
         $this->Posts->addBehavior('Kareylo/Comments.Commentable', []);
         $result = $result = $this->Posts->find()->where(['id' => 2])->find('comments')->first();
-        $expected = $this->Posts->find()->where(['id' => 2])->contain(['Comments' => function (Query $q) {
+        $expected = $this->Posts->get(2, ['contain' => ['Comments' => function (Query $q) {
             return $q->find('threaded')->contain('Users');
-        }])->first();
+        }]]);
         $this->assertEquals($expected, $result);
     }
 }

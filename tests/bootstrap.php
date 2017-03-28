@@ -1,46 +1,46 @@
 <?php
-require dirname(__DIR__) . '/vendor/cakephp/cakephp/src/basics.php';
-require dirname(__DIR__) . '/vendor/autoload.php';
-
-if (!defined('WINDOWS')) {
-    if (DS === '\\' || substr(PHP_OS, 0, 3) === 'WIN') {
-        define('WINDOWS', true);
-    } else {
-        define('WINDOWS', false);
+// @codingStandardsIgnoreFile
+$findRoot = function () {
+    $root = dirname(__DIR__);
+    if (is_dir($root . '/vendor/cakephp/cakephp')) {
+        return $root;
     }
+    $root = dirname(dirname(__DIR__));
+    if (is_dir($root . '/vendor/cakephp/cakephp')) {
+        return $root;
+    }
+    $root = dirname(dirname(dirname(__DIR__)));
+    if (is_dir($root . '/vendor/cakephp/cakephp')) {
+        return $root;
+    }
+};
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
 }
-
-define('ROOT', dirname(__DIR__));
+define('ROOT', $findRoot());
+define('APP_DIR', 'App');
+define('WEBROOT_DIR', 'webroot');
+define('APP', ROOT . '/tests/App/');
+define('CONFIG', ROOT . '/tests/config/');
+define('WWW_ROOT', ROOT . DS . WEBROOT_DIR . DS);
+define('TESTS', ROOT . DS . 'tests' . DS);
 define('TMP', ROOT . DS . 'tmp' . DS);
 define('LOGS', TMP . 'logs' . DS);
 define('CACHE', TMP . 'cache' . DS);
-define('APP', sys_get_temp_dir());
-define('APP_DIR', 'src');
 define('CAKE_CORE_INCLUDE_PATH', ROOT . '/vendor/cakephp/cakephp');
 define('CORE_PATH', CAKE_CORE_INCLUDE_PATH . DS);
-define('CAKE', CORE_PATH . APP_DIR . DS);
-
-define('WWW_ROOT', ROOT . DS . 'webroot' . DS);
-define('CONFIG', dirname(__FILE__) . DS . 'config' . DS);
-
-ini_set('intl.default_locale', 'de-DE');
-
-Cake\Core\Configure::write('App', [
-    'namespace' => 'App',
-    'encoding' => 'UTF-8']);
+define('CAKE', CORE_PATH . 'src' . DS);
+require ROOT . '/vendor/autoload.php';
+require CORE_PATH . 'config/bootstrap.php';
+Cake\Core\Configure::write('App', ['namespace' => 'Crud\Test\App']);
 Cake\Core\Configure::write('debug', true);
-
-mb_internal_encoding('UTF-8');
-
-$Tmp = new Cake\Filesystem\Folder(TMP);
-$Tmp->create(TMP . 'cache/models', 0770);
-$Tmp->create(TMP . 'cache/persistent', 0770);
-$Tmp->create(TMP . 'cache/views', 0770);
-
+$TMP = new \Cake\Filesystem\Folder(TMP);
+$TMP->create(TMP . 'cache/models', 0777);
+$TMP->create(TMP . 'cache/persistent', 0777);
+$TMP->create(TMP . 'cache/views', 0777);
 $cache = [
     'default' => [
-        'engine' => 'File',
-        'path' => CACHE
+        'engine' => 'File'
     ],
     '_cake_core_' => [
         'className' => 'File',
@@ -57,23 +57,18 @@ $cache = [
         'duration' => '+10 seconds'
     ]
 ];
-Cake\Cache\Cache::setConfig($cache);
-
-Cake\Core\Plugin::load('Kareylo/Comments', ['path' => ROOT . DS, 'autoload' => true]);
-
+Cake\Cache\Cache::config($cache);
+Cake\Core\Configure::write('Session', [
+    'defaults' => 'php'
+]);
+Cake\Core\Plugin::load('Kareylo/Comments', ['path' => ROOT . DS, 'autoload' => true, 'routes' => true]);
+Cake\Routing\DispatcherFactory::add('Routing');
+Cake\Routing\DispatcherFactory::add('ControllerFactory');
 // Ensure default test connection is defined
-if (!getenv('db_class')) {
-    putenv('db_class=Cake\Database\Driver\Sqlite');
-    putenv('db_dsn=sqlite::memory:');
+if (!getenv('db_dsn')) {
+    putenv('db_dsn=sqlite:///:memory:');
 }
-Cake\Datasource\ConnectionManager::setConfig('test', [
-    'className' => 'Cake\Database\Connection',
-    'driver' => getenv('db_class'),
-    'dsn' => getenv('db_dsn'),
-    'database' => getenv('db_database'),
-    'username' => getenv('db_username'),
-    'password' => getenv('db_password'),
-    'timezone' => 'UTC',
-    'quoteIdentifiers' => true,
-    'cacheMetadata' => true,
+Cake\Datasource\ConnectionManager::config('test', [
+    'url' => getenv('db_dsn'),
+    'timezone' => 'UTC'
 ]);
