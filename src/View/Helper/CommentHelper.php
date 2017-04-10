@@ -15,7 +15,7 @@ class CommentHelper extends Helper
     public $_defaultConfig = [
         'type' => 'ul',
         'typeClass' => null,
-        'subType' => 'li',
+        'subType' => null,
         'subTypeClass' => null,
         'loadJS' => false,
     ];
@@ -41,10 +41,12 @@ class CommentHelper extends Helper
         $this->_files['form'] = file_exists(APP . 'Template' . DS . 'Element' . DS . 'Comments' . DS . 'form.ctp') ? 'Comments/form' : 'Kareylo/Comments.form';
         $this->_files['content'] = file_exists(APP . 'Template' . DS . 'Element' . DS . 'Comments' . DS . 'comment.ctp') ? 'Comments/comment' : 'Kareylo/Comments.comment';
         $this->_connected = $this->request->session()->read('Auth.User.id') !== null;
-        if (!in_array($this->getConfig('type'), $this->_allowedTypes)) {
+        if (!in_array($this->getConfig('type'), $this->_allowedTypes) && $this->getConfig('type') !== null) {
             throw new \OutOfBoundsException(__("You can't use {$this->getConfig('type')} ! Please use one of the following : " . implode(', ', $this->_allowedTypes)));
         }
-        $this->setConfig('subType', $this->getConfig('type') === 'div' ? 'div' : 'li');
+        if($this->getConfig('type' !== null)) {
+            $this->setConfig('subType', $this->getConfig('type') === 'div' ? 'div' : 'li');
+        }
     }
 
     /**
@@ -162,13 +164,16 @@ class CommentHelper extends Helper
     private function _childless(EntityInterface $comment)
     {
         $html = '';
-        if ($this->getConfig('subTypeClass')) {
-            $html .= "<{$this->getConfig('subType')} class=\"{$this->getConfig('subTypeClass')}\">{$this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected])}";
+        if ($this->getConfig('subType') !== null) {
+            if ($this->getConfig('subTypeClass')) {
+                $html .= "<{$this->getConfig('subType')} class=\"{$this->getConfig('subTypeClass')}\">{$this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected])}";
+            } else {
+                $html .= "<{$this->getConfig('subType')}>{$this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected])}";
+            }
+            $html .= "</{$this->getConfig('subType')}>";
         } else {
-            $html .= "<{$this->getConfig('subType')}>{$this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected])}";
+            $html .= $this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected]);
         }
-        $html .= "</{$this->getConfig('subType')}>";
-
         return $html;
     }
 }

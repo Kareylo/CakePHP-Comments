@@ -37,7 +37,7 @@ class CommentableBehavior extends Behavior
             'foreignKey' => $this->getConfig('foreignKey'),
             'order' => 'Comments.created ASC',
             'conditions' => ['Comments.ref' => "{$this->_table->getAlias()}"],
-            'dependant' => true
+            'dependent' => true
         ]);
 
         if ($this->getConfig('countComments')) {
