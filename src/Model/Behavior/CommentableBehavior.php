@@ -1,4 +1,5 @@
 <?php
+
 namespace Kareylo\Comments\Model\Behavior;
 
 use Cake\ORM\Behavior;
@@ -60,8 +61,10 @@ class CommentableBehavior extends Behavior
      */
     public function findComments(Query $query, $options = [])
     {
-        return $query->contain(['Comments' => function (Query $q) use ($options) {
+        return $query->contain([
+            'Comments' => function (Query $q) use ($options) {
                 return $q->find('threaded')->contain('Users');
-        }]);
+            }
+        ]);
     }
 }

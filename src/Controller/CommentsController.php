@@ -1,4 +1,5 @@
 <?php
+
 namespace Kareylo\Comments\Controller;
 
 use Cake\Http\Response;

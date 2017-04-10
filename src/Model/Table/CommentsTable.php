@@ -1,4 +1,5 @@
 <?php
+
 namespace Kareylo\Comments\Model\Table;
 
 use Cake\Core\Configure;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Kareylo\Comments\View\Helper;
 
 use Cake\Datasource\EntityInterface;
@@ -44,7 +45,7 @@ class CommentHelper extends Helper
         if (!in_array($this->getConfig('type'), $this->_allowedTypes) && $this->getConfig('type') !== null) {
             throw new \OutOfBoundsException(__("You can't use {$this->getConfig('type')} ! Please use one of the following : " . implode(', ', $this->_allowedTypes)));
         }
-        if($this->getConfig('type' !== null)) {
+        if ($this->getConfig('type' !== null)) {
             $this->setConfig('subType', $this->getConfig('type') === 'div' ? 'div' : 'li');
         }
     }
@@ -174,6 +175,7 @@ class CommentHelper extends Helper
         } else {
             $html .= $this->_View->element($this->_files['content'], ['comment' => $comment, 'connected' => $this->_connected]);
         }
+
         return $html;
     }
 }
