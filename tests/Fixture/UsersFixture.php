@@ -12,7 +12,7 @@ class UsersFixture extends TestFixture
      * @access public
      */
     public $fields = [
-        'id' => ['type' => 'string', 'null' => false, 'length' => 11],
+        'id' => ['type' => 'integer'],
         'username' => ['type' => 'string', 'null' => false],
         'passwd' => ['type' => 'string', 'null' => true, 'default' => null, 'length' => 128],
         'created' => ['type' => 'datetime', 'null' => true, 'default' => null],

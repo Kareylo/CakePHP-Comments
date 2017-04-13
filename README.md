@@ -18,7 +18,7 @@ This plugin works with a behavior and a helper you need to load to fully works.
 ## Installation
 
 ```
-composer require Kareylo/CakePHP-Comments
+composer require kareylo/cakephp-comments
 ```
 
 load the plugin in your `config/bootstrap.php` :
@@ -35,9 +35,9 @@ $this->addBehavior('Kareylo/Comments.Commentable');
 The behavior can take these options :
 * **modelClass** : Class name of the ModelTable.
     * **Default** : `null`
-* **commentClass** : Name of your CommentsTable if you have one. 
+* **commentClass** : Name of your CommentsTable if you have one.
     * **Default** : `Kareylo/Comments.Comments`
-* **foreignKey** : Name of your custom foreignKey. 
+* **foreignKey** : Name of your custom foreignKey.
     * **Default** : `ref_id`
 * **countComments** : Put true if you wanna your model count its Comments
     * **Default** : `false`
@@ -75,7 +75,7 @@ To display your comments
 $this->Comment->display($data);
 ```
 
-You can also chose to not use `display($data)` and use a loop to have the full control of your template 
+You can also chose to not use `display($data)` and use a loop to have the full control of your template
 ```php
 // in your view
     <div class="row">
@@ -146,7 +146,7 @@ To create the template for your flash, just add a element in `src/Template/Eleme
  ?>
  <div class="message <?= $params['class'] ?? 'success' ?>" onclick="this.classList.add('hidden');"><?= $message ?></div>
  ```
- - `$params['class']` can have the values `success` and `error` 
+ - `$params['class']` can have the values `success` and `error`
 
 ## Support
 
