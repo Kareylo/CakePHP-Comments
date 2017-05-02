@@ -11,7 +11,7 @@ This plugin works with a behavior and a helper you need to load to fully works.
 
 ## Requirements
 
-* CakePHP 3.4+
+* [CakePHP](https://github.com/cakephp/cakephp) 3.4+
 * PHP 5.6+
 * AuthComponent
 
